@@ -1,0 +1,14 @@
+name: movies_infra
+include:
+  - elastic_db/docker-compose.tests.yml
+  - redis_db/docker-compose.tests.yml
+
+volumes:
+  test_elastic_data:
+    name: test_elastic_data
+  test_redis_data:
+    name: test_redis_data
+
+networks:
+  movies_net:
+    external: true

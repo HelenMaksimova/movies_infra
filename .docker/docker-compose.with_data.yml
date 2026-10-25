@@ -6,6 +6,8 @@ include:
   - nginx/docker-compose.base.yml
   - elastic_indexes/docker-compose.base.yml
   - sqlite_to_pg/docker-compose.base.yml
+  - redis_db/docker-compose.tests.yml
+  - elastic_db/docker-compose.tests.yml
 
 volumes:
   postgres_data:
@@ -18,6 +20,10 @@ volumes:
     name: nginx_static
   nginx_media:
     name: nginx_media
+  test_elastic_data:
+    name: test_elastic_data
+  test_redis_data:
+    name: test_redis_data
 
 networks:
   movies_net:
