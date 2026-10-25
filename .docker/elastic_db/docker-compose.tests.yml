@@ -1,0 +1,23 @@
+services:
+  test_elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.3.0
+    container_name: test_elastic
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+      - transport.host=localhost
+    volumes:
+      - test_elastic_data:/usr/share/elasticsearch/data
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9200" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
