@@ -1,0 +1,13 @@
+name: movies_infra
+include:
+  - nginx/docker-compose.base.yml
+
+volumes:
+  nginx_static:
+    name: nginx_static
+  nginx_media:
+    name: nginx_media
+
+networks:
+  movies_net:
+    external: true
