@@ -1,0 +1,20 @@
+services:
+  elastic_indexes:
+    container_name: elastic_indexes
+    image: alpine:latest
+    command: >
+      sh -c "
+        apk add --no-cache curl bash &&
+        bash /create_indexes.sh
+      "
+    env_file:
+      - ../../elastic_indexes/.env.indexes
+    volumes:
+      - ../../elastic_indexes/create_indexes.sh:/create_indexes.sh:ro
+      - ../../elastic_indexes/schemas:/schemas:ro
+    depends_on:
+      elastic:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - movies_net

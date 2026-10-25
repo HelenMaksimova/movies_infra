@@ -1,0 +1,22 @@
+name: movies_infra
+include:
+  - elastic_db/docker-compose.base.yml
+  - postgres_db/docker-compose.base.yml
+  - redis_db/docker-compose.base.yml
+  - nginx/docker-compose.base.yml
+
+volumes:
+  postgres_data:
+    name: postgres_data
+  elastic_data:
+    name: elastic_data
+  redis_data:
+    name: redis_data
+  nginx_static:
+    name: nginx_static
+  nginx_media:
+    name: nginx_media
+
+networks:
+  movies_net:
+    external: true

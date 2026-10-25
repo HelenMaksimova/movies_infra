@@ -1,0 +1,18 @@
+services:
+  test_redis:
+    image: redis:8.6.0
+    container_name: test_redis
+    volumes:
+      - test_redis_data:/data
+      - ../../redis_db:/etc/redis/redis.conf
+    command: >
+      redis-server /etc/redis/redis.conf
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-strongpassword}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3

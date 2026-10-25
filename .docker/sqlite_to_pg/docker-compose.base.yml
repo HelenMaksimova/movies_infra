@@ -1,0 +1,17 @@
+services:
+  sqlite_to_pg_app:
+    container_name: sqlite_to_pg_app
+    build: ../../sqlite_to_pg
+    env_file:
+      - ../../sqlite_to_pg/.env.app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - sh
+      - -c
+      - |
+        python create_tables.py &&
+        python load_data.py
+    networks:
+      - movies_net

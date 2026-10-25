@@ -1,0 +1,4 @@
+include:
+  - elastic_db/docker-compose.ports.yml
+  - postgres_db/docker-compose.ports.yml
+  - redis_db/docker-compose.ports.yml
