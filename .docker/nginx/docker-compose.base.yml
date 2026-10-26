@@ -9,3 +9,5 @@ services:
       - nginx_media:/data/media
     ports:
       - "8080:80"
+    networks:
+      - movies_net
