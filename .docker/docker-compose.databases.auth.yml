@@ -1,0 +1,14 @@
+name: movies_infra
+include:
+  - postgres_db/docker-compose.auth.yml
+  - redis_db/docker-compose.auth.yml
+
+volumes:
+  auth_postgres_data:
+    name: auth_postgres_data
+  auth_redis_data:
+    name: auth_redis_data
+
+networks:
+  movies_net:
+    external: true

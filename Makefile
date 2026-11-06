@@ -1,4 +1,4 @@
-.PHONY: clean create_network db_up db_up_with_data nginx_up tests_db_up up up_with_data help
+.PHONY: clean create_network db_up db_up_with_data nginx_up tests_db_up auth_db_up up up_with_data help
 
 NETWORK_NAME ?= movies_net
 CLEAN ?= false
@@ -8,15 +8,18 @@ CLEAN_TARGET ?= db
 
 SHELL := /bin/bash
 COMPOSE_PORTS := .docker/docker-compose.ports.yml
+COMPOSE_AUTH_PORTS := .docker/docker-compose.auth.ports.yml
 
 COMPOSE_DB        := .docker/docker-compose.databases.with_data.yml
 COMPOSE_NGINX     := .docker/docker-compose.nginx.yml
 COMPOSE_TESTS_DB  := .docker/docker-compose.databases.tests.yml
+COMPOSE_AUTH_DB   := .docker/docker-compose.databases.auth.yml
 COMPOSE_ALL       := .docker/docker-compose.with_data.yml
 
 COMPOSE_CLEAN := $(if $(filter nginx,$(CLEAN_TARGET)),$(COMPOSE_NGINX), \
                   $(if $(filter tests,$(CLEAN_TARGET)),$(COMPOSE_TESTS_DB), \
-                  $(if $(filter all,$(CLEAN_TARGET)),$(COMPOSE_ALL),$(COMPOSE_DB))))
+                  $(if $(filter auth,$(CLEAN_TARGET)),$(COMPOSE_AUTH_DB), \
+                  $(if $(filter all,$(CLEAN_TARGET)),$(COMPOSE_ALL),$(COMPOSE_DB)))))
 
 clean:
 	@echo "✅ Выполняем очистку (цель: $(CLEAN_TARGET), режим: $(CLEAN_MODE))..."
@@ -68,6 +71,17 @@ tests_db_up:
 	@$(MAKE) create_network
 	@docker compose -f .docker/docker-compose.databases.tests.yml up -d
 
+auth_db_up:
+	@if [ "$(CLEAN)" = "true" ]; then \
+		$(MAKE) clean CLEAN_MODE=volumes CLEAN_TARGET=auth; \
+	fi
+	@$(MAKE) create_network
+	@if [ "$(PORTS)" = "true" ]; then \
+		docker compose -f .docker/docker-compose.databases.auth.yml -f $(COMPOSE_AUTH_PORTS) up -d; \
+	else \
+		docker compose -f .docker/docker-compose.databases.auth.yml up -d; \
+	fi
+
 up:
 	@if [ "$(CLEAN)" = "true" ]; then \
 		$(MAKE) clean CLEAN_MODE=volumes CLEAN_TARGET=all; \
@@ -116,6 +130,11 @@ help:
 	@echo "      Поднимает базы для тестов."
 	@echo "      CLEAN=true  — перед запуском удаляет контейнеры/тома тестовых баз (CLEAN_MODE=volumes)."
 	@echo ""
+	@echo "  make auth_db_up [PORTS=true] [CLEAN=true]"
+	@echo "      Поднимает базы аутентификации."
+	@echo "      PORTS=true  — публикует порты на хост."
+	@echo "      CLEAN=true  — перед запуском удаляет контейнеры/тома auth-баз (CLEAN_MODE=volumes)."
+	@echo ""
 	@echo "  make up [PORTS=true] [CLEAN=true]"
 	@echo "      Поднимает все сервисы без начальных данных."
 	@echo "      PORTS=true  — публикует порты на хост."
@@ -126,11 +145,12 @@ help:
 	@echo "      PORTS=true  — публикует порты на хост."
 	@echo "      CLEAN=true  — перед запуском удаляет контейнеры/тома всех сервисов (CLEAN_MODE=volumes)."
 	@echo ""
-	@echo "  make clean [CLEAN_TARGET=db|nginx|tests|all] [CLEAN_MODE=soft|volumes|hard]"
+	@echo "  make clean [CLEAN_TARGET=db|nginx|tests|auth|all] [CLEAN_MODE=soft|volumes|hard]"
 	@echo "      Останавливает и удаляет контейнеры выбранной цели."
 	@echo "      CLEAN_TARGET=db     (по умолчанию) — .docker/docker-compose.databases.with_data.yml"
 	@echo "      CLEAN_TARGET=nginx  — .docker/docker-compose.nginx.yml"
 	@echo "      CLEAN_TARGET=tests  — .docker/docker-compose.databases.tests.yml"
+	@echo "      CLEAN_TARGET=auth   — .docker/docker-compose.databases.auth.yml"
 	@echo "      CLEAN_TARGET=all    — .docker/docker-compose.with_data.yml"
 	@echo "      CLEAN_MODE=soft     (по умолчанию) — контейнеры и сети проекта."
 	@echo "      CLEAN_MODE=volumes  — плюс тома проекта."

@@ -1,4 +1,5 @@
 include:
+  - docker-compose.auth.ports.yml
   - elastic_db/docker-compose.ports.yml
   - postgres_db/docker-compose.ports.yml
   - redis_db/docker-compose.ports.yml
